@@ -5,7 +5,7 @@ import { useState } from "react";
 import { content } from "@/lib/content";
 import { NoirButton } from "@/components/ui/Button";
 import { ScreenFrame } from "@/components/ui/ScreenFrame";
-import { Reaction } from "@/components/ui/Reaction";
+import { ReactionChat } from "@/components/ui/ReactionChat";
 import { ScreenProps } from "@/components/GameShell";
 
 export function ChoiceCardScreen({ onNext }: ScreenProps) {
@@ -46,10 +46,10 @@ export function ChoiceCardScreen({ onNext }: ScreenProps) {
         ))}
       </div>
 
-      <div className="min-h-[84px] mt-8 flex items-center justify-center">
+      <div className="min-h-[88px] mt-8 flex items-start">
         <AnimatePresence mode="wait">
           {chosenOption && (
-            <Reaction key={chosenOption.id} text={chosenOption.reaction} />
+            <ReactionChat key={chosenOption.id} text={chosenOption.reaction} />
           )}
         </AnimatePresence>
       </div>
@@ -59,7 +59,7 @@ export function ChoiceCardScreen({ onNext }: ScreenProps) {
           <motion.p
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8, duration: 0.7 }}
+            transition={{ delay: 1.2, duration: 0.7 }}
             className="mt-2 text-center font-hand text-rose/80 text-[20px] -rotate-1"
           >
             {choiceCard.chemistryNote}
@@ -73,7 +73,7 @@ export function ChoiceCardScreen({ onNext }: ScreenProps) {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 2.0 }}
+              transition={{ delay: 2.2 }}
             >
               <NoirButton
                 onClick={() =>

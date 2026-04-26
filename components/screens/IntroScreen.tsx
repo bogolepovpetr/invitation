@@ -21,17 +21,7 @@ export function IntroScreen({ onNext }: ScreenProps) {
 
   return (
     <ScreenFrame className="justify-between pt-16 pb-10">
-      {/* Eyebrow + handwritten personal kicker */}
       <div className="flex flex-col items-center gap-2">
-        <motion.div
-          variants={stagger}
-          initial="hidden"
-          animate="show"
-          custom={0}
-          className="eyebrow"
-        >
-          тест · для одного человека
-        </motion.div>
         <motion.div
           variants={stagger}
           initial="hidden"
@@ -39,7 +29,7 @@ export function IntroScreen({ onNext }: ScreenProps) {
           custom={1}
           className="font-hand text-rose text-[22px] leading-none -rotate-2"
         >
-          только для Кати
+          {intro.kicker}
         </motion.div>
       </div>
 
@@ -73,10 +63,12 @@ export function IntroScreen({ onNext }: ScreenProps) {
           initial="hidden"
           animate="show"
           custom={4}
-          className="font-serif italic text-[20px] leading-snug text-cream/75 text-center space-y-1"
+          className="font-serif italic text-[20px] leading-snug text-cream/75 text-center"
         >
           {intro.subtitle.map((line, i) => (
-            <p key={i}>{line}</p>
+            <p key={i} className={line ? "" : "h-3"}>
+              {line || "\u00A0"}
+            </p>
           ))}
         </motion.div>
       </div>

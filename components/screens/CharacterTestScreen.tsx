@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { content } from "@/lib/content";
 import { NoirButton } from "@/components/ui/Button";
 import { ScreenFrame } from "@/components/ui/ScreenFrame";
-import { Reaction } from "@/components/ui/Reaction";
+import { ReactionChat } from "@/components/ui/ReactionChat";
 import { ScreenProps } from "@/components/GameShell";
 
 export function CharacterTestScreen({ onNext }: ScreenProps) {
@@ -13,8 +13,8 @@ export function CharacterTestScreen({ onNext }: ScreenProps) {
   const total = characterTest.questions.length;
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [showDiagnosis, setShowDiagnosis] = useState(false);
-  const diagnosisRef = useRef<HTMLDivElement | null>(null);
+  const [showNext, setShowNext] = useState(false);
+  const nextRef = useRef<HTMLDivElement | null>(null);
 
   const q = characterTest.questions[index];
   const chosenId = answers[q?.id];
@@ -27,26 +27,23 @@ export function CharacterTestScreen({ onNext }: ScreenProps) {
       if (index < total - 1) {
         setIndex((i) => i + 1);
       } else {
-        setShowDiagnosis(true);
+        setShowNext(true);
       }
     }, 1300);
   };
 
   useEffect(() => {
-    if (showDiagnosis && diagnosisRef.current) {
-      diagnosisRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (showNext && nextRef.current) {
+      nextRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
     }
-  }, [showDiagnosis]);
+  }, [showNext]);
 
   return (
     <ScreenFrame className="pt-12 pb-10">
       <div className="flex flex-col items-center gap-1 mb-3">
-        <div className="eyebrow">быстрый тест на характер</div>
-        <div className="font-hand text-rose/80 text-[18px] leading-none -rotate-1">
-          три подряд
-        </div>
+        <div className="eyebrow">{characterTest.eyebrow}</div>
       </div>
-      <p className="text-cream/60 text-center font-serif italic mb-8">
+      <p className="text-cream/60 text-center font-serif italic mb-8 whitespace-pre-line">
         {characterTest.intro}
       </p>
 
@@ -98,10 +95,13 @@ export function CharacterTestScreen({ onNext }: ScreenProps) {
             ))}
           </div>
 
-          <div className="min-h-[72px] flex items-center justify-center">
+          <div className="min-h-[88px] flex items-start">
             <AnimatePresence mode="wait">
               {chosenOption && (
-                <Reaction key={chosenOption.id} text={chosenOption.reaction} />
+                <ReactionChat
+                  key={chosenOption.id}
+                  text={chosenOption.reaction}
+                />
               )}
             </AnimatePresence>
           </div>
@@ -109,50 +109,24 @@ export function CharacterTestScreen({ onNext }: ScreenProps) {
       </AnimatePresence>
 
       <AnimatePresence>
-        {showDiagnosis && (
+        {showNext && (
           <motion.div
-            ref={diagnosisRef}
-            initial={{ opacity: 0, y: 20 }}
+            ref={nextRef}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="mt-12 pt-8 space-y-5"
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="mt-auto pt-8"
           >
-            <div className="rose-divider text-gold/60 mb-2">
-              <svg width="12" height="12" viewBox="0 0 16 16" aria-hidden>
-                <circle cx="8" cy="8" r="2.5" fill="currentColor" opacity="0.8" />
-              </svg>
-            </div>
-
-            <div className="font-serif italic text-[22px] leading-snug text-cream/90 text-center space-y-1">
-              {characterTest.diagnosis.map((line, i) => (
-                <motion.p
-                  key={i}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 + i * 0.4 }}
-                >
-                  {line}
-                </motion.p>
-              ))}
-            </div>
-
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.8 }}
-              className="pt-4"
+            <NoirButton
+              onClick={() =>
+                onNext({
+                  id: "character",
+                  value: Object.values(answers).join(","),
+                })
+              }
             >
-              <NoirButton
-                onClick={() =>
-                  onNext({
-                    id: "character",
-                    value: Object.values(answers).join(","),
-                  })
-                }
-              >
-                Дальше
-              </NoirButton>
-            </motion.div>
+              Дальше
+            </NoirButton>
           </motion.div>
         )}
       </AnimatePresence>

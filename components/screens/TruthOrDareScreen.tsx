@@ -5,7 +5,6 @@ import { useState } from "react";
 import { content } from "@/lib/content";
 import { NoirButton } from "@/components/ui/Button";
 import { ScreenFrame } from "@/components/ui/ScreenFrame";
-import { RewardCard } from "@/components/ui/RewardCard";
 import { ScreenProps } from "@/components/GameShell";
 
 type Side = "truth" | "dare";
@@ -14,9 +13,7 @@ export function TruthOrDareScreen({ onNext }: ScreenProps) {
   const { truthOrDare } = content;
   const [flipped, setFlipped] = useState(false);
   const [side, setSide] = useState<Side | null>(null);
-  const [rewardStage, setRewardStage] = useState<
-    "idle" | "primary" | "secondary" | "done"
-  >("idle");
+  const [showNext, setShowNext] = useState(false);
 
   const chosen = truthOrDare.options.find((o) => o.id === side);
 
@@ -24,36 +21,13 @@ export function TruthOrDareScreen({ onNext }: ScreenProps) {
     if (side) return;
     setSide(s);
     setFlipped(true);
-    window.setTimeout(() => setRewardStage("primary"), 2200);
+    window.setTimeout(() => setShowNext(true), 2200);
   };
-
-  const handleCloseReward = () => {
-    if (rewardStage === "primary") {
-      if (truthOrDare.rewardCardSecondary) {
-        setRewardStage("idle");
-        window.setTimeout(() => setRewardStage("secondary"), 450);
-      } else {
-        setRewardStage("done");
-      }
-    } else if (rewardStage === "secondary") {
-      setRewardStage("done");
-    }
-  };
-
-  const rewardOpen =
-    rewardStage === "primary" || rewardStage === "secondary";
-  const rewardText =
-    rewardStage === "secondary" && truthOrDare.rewardCardSecondary
-      ? truthOrDare.rewardCardSecondary
-      : truthOrDare.rewardCard;
 
   return (
     <ScreenFrame className="pt-14 pb-10">
       <div className="flex flex-col items-center gap-1 mb-4">
-        <div className="eyebrow">карточка · переверни её</div>
-        <div className="font-hand text-rose/80 text-[17px] leading-none -rotate-1">
-          выбирай смелее
-        </div>
+        <div className="eyebrow">{truthOrDare.eyebrow}</div>
       </div>
 
       <h2 className="display text-[28px] text-cream text-center mb-10">
@@ -107,10 +81,11 @@ export function TruthOrDareScreen({ onNext }: ScreenProps) {
 
       <div className="mt-auto pt-10">
         <AnimatePresence>
-          {rewardStage === "done" && (
+          {showNext && (
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
             >
               <NoirButton
                 onClick={() =>
@@ -123,12 +98,6 @@ export function TruthOrDareScreen({ onNext }: ScreenProps) {
           )}
         </AnimatePresence>
       </div>
-
-      <RewardCard
-        open={rewardOpen}
-        text={rewardText}
-        onClose={handleCloseReward}
-      />
     </ScreenFrame>
   );
 }

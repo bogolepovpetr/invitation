@@ -8,13 +8,11 @@ import { ScreenFrame } from "@/components/ui/ScreenFrame";
 import { ScreenProps } from "@/components/GameShell";
 
 type Stage = "sealed" | "opening" | "card";
-type Answer = "accept" | "hesitate" | null;
 
 export function InvitationScreen(_: ScreenProps) {
   const { invitation } = content;
   const [stage, setStage] = useState<Stage>("sealed");
-  const [answer, setAnswer] = useState<Answer>(null);
-  const [showAcceptAgain, setShowAcceptAgain] = useState(false);
+  const [accepted, setAccepted] = useState(false);
   const [confetti, setConfetti] = useState(false);
 
   const handleOpen = () => {
@@ -23,14 +21,10 @@ export function InvitationScreen(_: ScreenProps) {
     window.setTimeout(() => setStage("card"), 1200);
   };
 
-  const choose = (a: Answer) => {
-    if (answer) return;
-    setAnswer(a);
-    if (a === "accept") {
-      setConfetti(true);
-    } else if (a === "hesitate") {
-      window.setTimeout(() => setShowAcceptAgain(true), 2000);
-    }
+  const handleAccept = () => {
+    if (accepted) return;
+    setAccepted(true);
+    setConfetti(true);
   };
 
   return (
@@ -128,66 +122,30 @@ export function InvitationScreen(_: ScreenProps) {
               </svg>
             </div>
 
-            <div className="flex flex-col items-center gap-1.5 text-cream/90">
-              <div className="font-serif italic text-[22px] text-cream">
-                {invitation.date}
-              </div>
-              <div className="eyebrow text-cream/55">{invitation.time}</div>
-              <div className="font-serif italic text-[14px] text-cream/70">
-                {invitation.place}
-              </div>
-            </div>
+            <DateBlock
+              options={invitation.dateOptions}
+              caption={invitation.dateCaption}
+              note={invitation.dateNote}
+            />
 
-            <div className="my-6 border-t border-dashed border-gold/25" />
-
-            <p className="font-serif italic text-[17px] leading-snug text-cream/85 text-center whitespace-pre-line">
-              {invitation.promise}
-            </p>
-
-            <div className="mt-8 space-y-3">
-              {!answer && (
-                <>
-                  <NoirButton onClick={() => choose("accept")}>
-                    {invitation.accept.label}
-                  </NoirButton>
-                  <NoirButton
-                    variant="ghost"
-                    onClick={() => choose("hesitate")}
-                  >
-                    {invitation.hesitate.label}
-                  </NoirButton>
-                </>
+            <div className="mt-8 space-y-4">
+              {!accepted && (
+                <NoirButton onClick={handleAccept}>
+                  {invitation.accept.label}
+                </NoirButton>
               )}
 
               <AnimatePresence>
-                {answer && (
+                {accepted && (
                   <motion.p
-                    key={answer}
+                    key="accept-reaction"
                     initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
-                    className="font-serif italic text-center text-[18px] text-cream/90 px-2 whitespace-pre-line"
+                    className="font-serif italic text-center text-[19px] text-cream/95 px-2 whitespace-pre-line"
                   >
-                    {answer === "accept"
-                      ? invitation.accept.reaction
-                      : invitation.hesitate.reaction}
+                    {invitation.accept.reaction}
                   </motion.p>
-                )}
-              </AnimatePresence>
-
-              <AnimatePresence>
-                {showAcceptAgain && answer === "hesitate" && (
-                  <motion.div
-                    key="accept-again"
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
-                    className="pt-3"
-                  >
-                    <NoirButton onClick={() => choose("accept")}>
-                      {invitation.accept.label}
-                    </NoirButton>
-                  </motion.div>
                 )}
               </AnimatePresence>
             </div>
@@ -330,6 +288,156 @@ function ConfettiBurst({ active }: { active: boolean }) {
         />
       ))}
     </div>
+  );
+}
+
+/**
+ * Блок даты-приглашения: две крупные цифры, между ними золотая «или»,
+ * сверху и снизу — тонкие хайрлайны. Под цифрами — caption и handwritten note.
+ */
+function DateBlock({
+  options,
+  caption,
+  note,
+}: {
+  options: string[];
+  caption: string;
+  note: string;
+}) {
+  const [a, b] = options;
+
+  return (
+    <div className="flex flex-col items-center gap-3 my-3">
+      {/* Цифры с разделителем «или» */}
+      <div className="flex items-center justify-center gap-5">
+        <DateCard digit={a ?? ""} delay={0.05} />
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.25, type: "spring", stiffness: 240, damping: 18 }}
+          className="flex flex-col items-center"
+          aria-hidden
+        >
+          <span
+            className="font-serif italic text-[20px] leading-none text-gold"
+            style={{ textShadow: "0 0 14px rgba(232,165,184,0.5)" }}
+          >
+            или
+          </span>
+          <span
+            className="mt-1 block h-px w-7"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, rgba(217,182,121,0.7), transparent)",
+            }}
+          />
+        </motion.div>
+
+        <DateCard digit={b ?? ""} delay={0.18} />
+      </div>
+
+      {/* Caption: мая · вечером */}
+      <motion.div
+        initial={{ opacity: 0, y: 4 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.35, duration: 0.6 }}
+        className="eyebrow text-gold/85"
+      >
+        {caption}
+      </motion.div>
+
+      {/* Handwritten note: когда тебе удобнее */}
+      <motion.div
+        initial={{ opacity: 0, y: 4, rotate: -3 }}
+        animate={{ opacity: 1, y: 0, rotate: -2 }}
+        transition={{ delay: 0.5, duration: 0.7 }}
+        className="font-hand text-rose text-[20px] leading-none"
+      >
+        {note}
+      </motion.div>
+    </div>
+  );
+}
+
+/** Большая цифра-«билетик» с золотой рамкой, лёгким свечением и блёсткой. */
+function DateCard({ digit, delay = 0 }: { digit: string; delay?: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12, scale: 0.85, rotate: -4 }}
+      animate={{ opacity: 1, y: 0, scale: 1, rotate: 0 }}
+      transition={{
+        delay,
+        type: "spring",
+        stiffness: 200,
+        damping: 16,
+        mass: 0.7,
+      }}
+      className="relative flex h-[78px] w-[68px] items-center justify-center rounded-xl"
+      style={{
+        background:
+          "linear-gradient(160deg, rgba(36,16,28,0.95) 0%, rgba(22,10,16,0.95) 60%, rgba(36,16,28,0.95) 100%)",
+        boxShadow:
+          "inset 0 0 0 1px rgba(217,182,121,0.55), inset 0 0 0 5px rgba(217,182,121,0.08), 0 14px 30px -14px rgba(0,0,0,0.85), 0 0 22px -10px rgba(232,165,184,0.4)",
+      }}
+    >
+      {/* Уголки-засечки на билетике */}
+      <span
+        aria-hidden
+        className="absolute top-1.5 left-1.5 h-2 w-2"
+        style={{
+          borderTop: "1px solid rgba(217,182,121,0.55)",
+          borderLeft: "1px solid rgba(217,182,121,0.55)",
+        }}
+      />
+      <span
+        aria-hidden
+        className="absolute top-1.5 right-1.5 h-2 w-2"
+        style={{
+          borderTop: "1px solid rgba(217,182,121,0.55)",
+          borderRight: "1px solid rgba(217,182,121,0.55)",
+        }}
+      />
+      <span
+        aria-hidden
+        className="absolute bottom-1.5 left-1.5 h-2 w-2"
+        style={{
+          borderBottom: "1px solid rgba(217,182,121,0.55)",
+          borderLeft: "1px solid rgba(217,182,121,0.55)",
+        }}
+      />
+      <span
+        aria-hidden
+        className="absolute bottom-1.5 right-1.5 h-2 w-2"
+        style={{
+          borderBottom: "1px solid rgba(217,182,121,0.55)",
+          borderRight: "1px solid rgba(217,182,121,0.55)",
+        }}
+      />
+
+      {/* Сама цифра */}
+      <span
+        className="font-serif italic text-cream leading-none"
+        style={{
+          fontSize: 50,
+          textShadow:
+            "0 0 18px rgba(232,165,184,0.45), 0 2px 0 rgba(0,0,0,0.4)",
+        }}
+      >
+        {digit}
+      </span>
+
+      {/* Постоянное мягкое мерцание ободка */}
+      <motion.span
+        aria-hidden
+        animate={{ opacity: [0.3, 0.7, 0.3] }}
+        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute inset-0 rounded-xl pointer-events-none"
+        style={{
+          boxShadow: "0 0 16px 1px rgba(232,165,184,0.35)",
+        }}
+      />
+    </motion.div>
   );
 }
 

@@ -22,10 +22,7 @@ export function PreFinalScreen({ onNext }: ScreenProps) {
   return (
     <ScreenFrame className="pt-14 pb-10">
       <div className="flex flex-col items-center gap-1 mb-8">
-        <div className="eyebrow">проверка завершена</div>
-        <div className="font-hand text-rose/80 text-[17px] leading-none -rotate-1">
-          заключение
-        </div>
+        <div className="eyebrow">{preFinal.eyebrow}</div>
       </div>
 
       <div className="space-y-3 font-serif italic text-[24px] leading-snug text-cream text-center mb-10">

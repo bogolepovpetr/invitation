@@ -5,31 +5,26 @@ import { useState } from "react";
 import { content } from "@/lib/content";
 import { NoirButton } from "@/components/ui/Button";
 import { ScreenFrame } from "@/components/ui/ScreenFrame";
-import { Reaction } from "@/components/ui/Reaction";
-import { RewardCard } from "@/components/ui/RewardCard";
+import { ReactionChat } from "@/components/ui/ReactionChat";
 import { ScreenProps } from "@/components/GameShell";
 
 export function StatusScreen({ onNext }: ScreenProps) {
   const { status } = content;
   const [chosen, setChosen] = useState<string | null>(null);
-  const [rewardOpen, setRewardOpen] = useState(false);
-  const [rewardSeen, setRewardSeen] = useState(false);
+  const [showNext, setShowNext] = useState(false);
 
   const chosenOption = status.options.find((o) => o.id === chosen);
 
   const handleSelect = (id: string) => {
     if (chosen) return;
     setChosen(id);
-    window.setTimeout(() => setRewardOpen(true), 1800);
+    window.setTimeout(() => setShowNext(true), 1800);
   };
 
   return (
     <ScreenFrame className="pt-14 pb-10">
       <div className="flex flex-col items-center gap-1 mb-8">
-        <div className="eyebrow">официальный статус</div>
-        <div className="font-hand text-rose/80 text-[17px] leading-none -rotate-1">
-          под запись
-        </div>
+        <div className="eyebrow">{status.eyebrow}</div>
       </div>
 
       <h2 className="display text-[28px] text-cream text-center mb-10">
@@ -50,20 +45,22 @@ export function StatusScreen({ onNext }: ScreenProps) {
         ))}
       </div>
 
-      <div className="mt-8 min-h-[80px] flex items-center justify-center">
+      <div className="mt-8 min-h-[96px] flex items-start">
         <AnimatePresence mode="wait">
           {chosenOption && (
-            <Reaction key={chosenOption.id} text={chosenOption.reaction} />
+            <ReactionChat key={chosenOption.id} text={chosenOption.reaction} />
           )}
         </AnimatePresence>
       </div>
 
-      <div className="mt-auto pt-8">
+      <div className="mt-auto pt-6">
         <AnimatePresence>
-          {rewardSeen && (
+          {showNext && (
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
             >
               <NoirButton
                 onClick={() =>
@@ -76,17 +73,6 @@ export function StatusScreen({ onNext }: ScreenProps) {
           )}
         </AnimatePresence>
       </div>
-
-      <RewardCard
-        open={rewardOpen}
-        text={status.rewardCard}
-        variant="stamp"
-        stampText="ОФИЦИАЛЬНО"
-        onClose={() => {
-          setRewardOpen(false);
-          setRewardSeen(true);
-        }}
-      />
     </ScreenFrame>
   );
 }

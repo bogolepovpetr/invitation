@@ -34,7 +34,8 @@ const STEPS: {
   { id: "character", Component: CharacterTestScreen },
   { id: "choice", Component: ChoiceCardScreen },
   { id: "truth-or-dare", Component: TruthOrDareScreen },
-  { id: "slider", Component: SliderScreen },
+  { id: "slider-1", Component: (p) => <SliderScreen {...p} index={0} /> },
+  { id: "slider-2", Component: (p) => <SliderScreen {...p} index={1} /> },
   { id: "status", Component: StatusScreen },
   { id: "prefinal", Component: PreFinalScreen },
   { id: "video-message", Component: VideoMessageScreen },
@@ -70,7 +71,7 @@ export function GameShell() {
     [advance, answers],
   );
 
-  const envelopeVisible = !envelopeOpened && step >= 1 && step <= 7;
+  const envelopeVisible = !envelopeOpened && step >= 1 && step <= 8;
 
   return (
     <main className="relative">
