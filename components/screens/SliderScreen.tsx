@@ -106,7 +106,7 @@ export function SliderScreen({ onNext, index = 0 }: Props) {
       <div className="mt-auto pt-10">
         {!committed ? (
           <NoirButton onClick={handleCommit} disabled={!touched}>
-            Зафиксировать
+            Далее
           </NoirButton>
         ) : (
           <motion.div
@@ -115,7 +115,7 @@ export function SliderScreen({ onNext, index = 0 }: Props) {
             transition={{ delay: 0.6 }}
           >
             <NoirButton onClick={() => onNext({ id: answerId, value })}>
-              {isLast ? "Дальше" : "Следующая шкала"}
+              Далее
             </NoirButton>
           </motion.div>
         )}
