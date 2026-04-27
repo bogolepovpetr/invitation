@@ -388,7 +388,6 @@ export const content: Content = {
 
   envelopeBonus: {
     buttonHint: "коснись, чтобы закрыть",
-    body:
-      "Ты правда думала,\nчто просто проходишь этот тест?",
+    body: "Желаю удачи!\nОтвечай честно))",
   },
 };
