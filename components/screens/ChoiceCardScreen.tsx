@@ -21,16 +21,12 @@ export function ChoiceCardScreen({ onNext }: ScreenProps) {
 
   return (
     <ScreenFrame className="pt-14 pb-10">
-      <div className="flex flex-col items-center gap-1 mb-10">
+      <div className="flex flex-col items-center gap-1 mb-12">
         <div className="eyebrow">карточка выбора</div>
         <div className="font-hand text-rose/80 text-[18px] leading-none -rotate-1">
           аккуратно
         </div>
       </div>
-
-      <h2 className="display text-[30px] text-cream text-center mb-10">
-        {choiceCard.title}
-      </h2>
 
       <div className="flex flex-col gap-3">
         {choiceCard.options.map((opt) => (
